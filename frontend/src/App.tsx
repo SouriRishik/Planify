@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Login from './components/Auth/Login';
@@ -12,6 +12,10 @@ import TaskList from './components/Tasks/TaskList';
 
 const App: React.FC = () => {
   const { user, loading } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  const closeMobileMenu = () => setIsMobileMenuOpen(false);
 
   if (loading) {
     return <div className="loading-screen">Loading…</div>;
@@ -32,9 +36,12 @@ const App: React.FC = () => {
 
   return (
     <div className="app-layout">
-      <Header />
+      <Header toggleMobileMenu={toggleMobileMenu} />
       <div className="app-body">
-        <Sidebar />
+        <Sidebar isOpen={isMobileMenuOpen} closeMenu={closeMobileMenu} />
+        {isMobileMenuOpen && (
+          <div className="mobile-overlay mobile-open" onClick={closeMobileMenu} />
+        )}
         <main className="main-content">
           <Routes>
             <Route path="/" element={<Dashboard />} />

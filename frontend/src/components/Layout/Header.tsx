@@ -2,13 +2,26 @@ import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useTheme } from '../../context/ThemeContext';
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  toggleMobileMenu?: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ toggleMobileMenu }) => {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
   return (
     <header className="header">
-      <h1 className="header-logo">PLANIFY</h1>
+      <div className="header-left">
+        <button className="mobile-menu-btn" onClick={toggleMobileMenu} title="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+        <h1 className="header-logo">PLANIFY</h1>
+      </div>
       <div className="header-right">
         <button onClick={toggleTheme} className="theme-toggle" title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}>
           {theme === 'light' ? (

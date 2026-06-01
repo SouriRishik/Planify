@@ -4,7 +4,12 @@ import { Project } from '../../types';
 import { projectAPI } from '../../api/api';
 import ProjectForm from '../Projects/ProjectForm';
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  isOpen?: boolean;
+  closeMenu?: () => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ isOpen, closeMenu }) => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [showForm, setShowForm] = useState(false);
   const navigate = useNavigate();
@@ -20,15 +25,20 @@ const Sidebar: React.FC = () => {
     setProjects((prev) => [project, ...prev]);
     setShowForm(false);
     navigate(`/projects/${project.id}`);
+    if (closeMenu) closeMenu();
+  };
+
+  const handleNavClick = () => {
+    if (closeMenu) closeMenu();
   };
 
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
       <nav className="sidebar-nav">
-        <NavLink to="/" end className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <NavLink to="/" end onClick={handleNavClick} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
           <span className="sidebar-icon">📊</span> Dashboard
         </NavLink>
-        <NavLink to="/projects" end className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
+        <NavLink to="/projects" end onClick={handleNavClick} className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>
           <span className="sidebar-icon">📁</span> All Projects
         </NavLink>
       </nav>
@@ -48,6 +58,7 @@ const Sidebar: React.FC = () => {
             <li key={p.id}>
               <NavLink
                 to={`/projects/${p.id}`}
+                onClick={handleNavClick}
                 className={({ isActive }) => `sidebar-project ${isActive ? 'active' : ''}`}
               >
                 <span className="project-dot" />
