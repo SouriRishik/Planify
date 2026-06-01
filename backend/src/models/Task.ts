@@ -151,9 +151,9 @@ export const TaskModel = {
     const res = await db.query(`
       SELECT
         COUNT(*)::int                                                    as total,
-        SUM(CASE WHEN status = 'todo'        THEN 1 ELSE 0 END)::int   as todo,
-        SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END)::int   as in_progress,
-        SUM(CASE WHEN status = 'done'        THEN 1 ELSE 0 END)::int   as done
+        COALESCE(SUM(CASE WHEN status = 'todo'        THEN 1 ELSE 0 END), 0)::int   as todo,
+        COALESCE(SUM(CASE WHEN status = 'in_progress' THEN 1 ELSE 0 END), 0)::int   as in_progress,
+        COALESCE(SUM(CASE WHEN status = 'done'        THEN 1 ELSE 0 END), 0)::int   as done
       FROM tasks WHERE user_id = $1
     `, [userId]);
     return res.rows[0] as { total: number; todo: number; in_progress: number; done: number };

@@ -23,19 +23,19 @@ const Dashboard: React.FC = () => {
 
       <div className="stats-grid">
         <div className="stat-card">
-          <span className="stat-number">{stats.total}</span>
+          <span className="stat-number">{stats?.total ?? 0}</span>
           <span className="stat-label">Total Tasks</span>
         </div>
         <div className="stat-card stat-todo">
-          <span className="stat-number">{stats.todo}</span>
+          <span className="stat-number">{stats?.todo ?? 0}</span>
           <span className="stat-label">To Do</span>
         </div>
         <div className="stat-card stat-progress">
-          <span className="stat-number">{stats.in_progress}</span>
+          <span className="stat-number">{stats?.in_progress ?? 0}</span>
           <span className="stat-label">In Progress</span>
         </div>
         <div className="stat-card stat-done">
-          <span className="stat-number">{stats.done}</span>
+          <span className="stat-number">{stats?.done ?? 0}</span>
           <span className="stat-label">Done</span>
         </div>
       </div>
