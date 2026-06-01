@@ -1,6 +1,6 @@
 # Planify
 
-Planify is a full-stack task and project management application built with React, TypeScript, Express, and SQLite. It provides user authentication, project organization, task tracking with priorities and statuses, and a dashboard overview.
+Planify is a full-stack task and project management application built with React, TypeScript, Express, and PostgreSQL. It provides user authentication, project organization, task tracking with priorities and statuses, and a dashboard overview.
 
 ---
 
@@ -34,7 +34,7 @@ Planify is a full-stack task and project management application built with React
 
 - Node.js with Express
 - TypeScript
-- SQLite (better-sqlite3)
+- PostgreSQL (pg)
 - JSON Web Tokens (jsonwebtoken)
 - bcryptjs
 - Nodemailer
@@ -48,7 +48,7 @@ Make sure the following are installed on your system before proceeding:
 - Node.js (v18 or higher)
 - npm (v9 or higher)
 
-No external database setup is required. The application uses SQLite, which stores data in a local file created automatically on first run.
+The backend requires a PostgreSQL database. For local testing you can use the included `docker-compose.yml` which starts Postgres and the backend together.
 
 ---
 
