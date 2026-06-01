@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
+  verifySignup: (email: string, otp: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -47,7 +48,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const signup = async (name: string, email: string, password: string) => {
-    const res = await api.post('/auth/signup', { name, email, password });
+    await api.post('/auth/signup', { name, email, password });
+  };
+
+  const verifySignup = async (email: string, otp: string) => {
+    const res = await api.post('/auth/verify-signup', { email, otp });
     localStorage.setItem('planify_token', res.data.token);
     setUser(res.data.user);
   };
@@ -58,7 +63,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, signup, verifySignup, logout }}>
       {children}
     </AuthContext.Provider>
   );

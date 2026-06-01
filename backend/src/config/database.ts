@@ -49,6 +49,17 @@ async function ensureSchema(): Promise<void> {
       used BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
     )`);
+
+    await client.query(`CREATE TABLE IF NOT EXISTS signup_otps (
+      id SERIAL PRIMARY KEY,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      otp TEXT NOT NULL,
+      expires_at TIMESTAMP WITH TIME ZONE NOT NULL,
+      used BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    )`);
   } finally {
     client.release();
   }

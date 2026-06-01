@@ -5,6 +5,7 @@ import { authenticate } from '../middleware/auth';
 const router = Router();
 
 router.post('/signup', authController.signup);
+router.post('/verify-signup', authController.verifySignup);
 router.post('/login', authController.login);
 router.post('/forgot-password', authController.forgotPassword);
 router.post('/verify-otp', authController.verifyOtp);

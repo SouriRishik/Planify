@@ -7,13 +7,16 @@ const Signup: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [otp, setOtp] = useState('');
+  const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const { signup } = useAuth();
+  const [successMsg, setSuccessMsg] = useState('');
+  const { signup, verifySignup } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSignupSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -24,9 +27,22 @@ const Signup: React.FC = () => {
 
     try {
       await signup(name, email, password);
-      navigate('/');
+      setSuccessMsg('OTP sent to your email.');
+      setStep(2);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Signup failed. Please try again.');
+    }
+  };
+
+  const handleVerifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    try {
+      await verifySignup(email, otp);
+      navigate('/');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Verification failed. Please check the OTP and try again.');
     }
   };
 
@@ -56,70 +72,101 @@ const Signup: React.FC = () => {
         <p className="auth-subtitle">Create your account</p>
 
         {error && <div className="error-message">{error}</div>}
+        {successMsg && <div className="success-message" style={{ background: 'var(--success-light)', color: 'var(--success)', padding: '0.5rem 0.75rem', borderRadius: 'var(--radius)', fontSize: '0.8125rem', marginBottom: '1rem' }}>{successMsg}</div>}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="name">Name</label>
-            <input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="John Doe"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@gmail.com"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <div className="password-input-wrapper">
+        {step === 1 ? (
+          <form onSubmit={handleSignupSubmit}>
+            <div className="form-group">
+              <label htmlFor="name">Name</label>
               <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Minimum 6 characters"
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="John Doe"
                 required
-                minLength={6}
               />
-              <button
-                type="button"
-                className="password-toggle"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? 'Hide password' : 'Show password'}
-              >
-                {showPassword ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                    <line x1="1" y1="1" x2="23" y2="23" />
-                  </svg>
-                ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                    <circle cx="12" cy="12" r="3" />
-                  </svg>
-                )}
-              </button>
             </div>
-          </div>
 
-          <button type="submit" className="btn btn-primary btn-full">
-            Create Account
-          </button>
-        </form>
+            <div className="form-group">
+              <label htmlFor="email">Email</label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@gmail.com"
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="password">Password</label>
+              <div className="password-input-wrapper">
+                <input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Minimum 6 characters"
+                  required
+                  minLength={6}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                      <line x1="1" y1="1" x2="23" y2="23" />
+                    </svg>
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                      <circle cx="12" cy="12" r="3" />
+                    </svg>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" className="btn btn-primary btn-full">
+              Create Account
+            </button>
+          </form>
+        ) : (
+          <form onSubmit={handleVerifySubmit}>
+            <div className="form-group">
+              <label htmlFor="otp">Enter Verification Code (OTP)</label>
+              <input
+                id="otp"
+                type="text"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                placeholder="6-digit OTP"
+                required
+                maxLength={6}
+                style={{ textAlign: 'center', fontSize: '1.25rem', letterSpacing: '4px' }}
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary btn-full">
+              Verify & Complete Signup
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-full"
+              style={{ marginTop: '0.5rem' }}
+              onClick={() => { setStep(1); setSuccessMsg(''); setError(''); }}
+            >
+              Back
+            </button>
+          </form>
+        )}
 
         <p className="auth-link">
           Already have an account? <Link to="/login">Sign in</Link>
