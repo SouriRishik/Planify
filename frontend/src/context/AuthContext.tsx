@@ -5,32 +5,44 @@ import { api } from '../api/api';
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const getToken = (): string | null =>
+  localStorage.getItem('planify_token') || sessionStorage.getItem('planify_token');
+
+const removeToken = (): void => {
+  localStorage.removeItem('planify_token');
+  sessionStorage.removeItem('planify_token');
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('planify_token');
+    const token = getToken();
     if (token) {
       api.get('/auth/me')
         .then((res) => setUser(res.data))
-        .catch(() => localStorage.removeItem('planify_token'))
+        .catch(() => removeToken())
         .finally(() => setLoading(false));
     } else {
       setLoading(false);
     }
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, rememberMe = false) => {
     const res = await api.post('/auth/login', { email, password });
-    localStorage.setItem('planify_token', res.data.token);
+    if (rememberMe) {
+      localStorage.setItem('planify_token', res.data.token);
+    } else {
+      sessionStorage.setItem('planify_token', res.data.token);
+    }
     setUser(res.data.user);
   };
 
@@ -41,7 +53,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   const logout = () => {
-    localStorage.removeItem('planify_token');
+    removeToken();
     setUser(null);
   };
 

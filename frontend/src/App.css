@@ -20,6 +20,26 @@
   --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
   --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+[data-theme='dark'] {
+  --primary: #818cf8;
+  --primary-hover: #6366f1;
+  --primary-light: #1e1b4b;
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --border: #334155;
+  --text: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-light: #64748b;
+  --success: #34d399;
+  --success-light: #064e3b;
+  --warning: #fbbf24;
+  --warning-light: #451a03;
+  --danger: #f87171;
+  --danger-light: #450a0a;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.25);
+}
 *,
 *::before,
 *::after {
@@ -66,6 +86,7 @@ a:hover {
   border-radius: var(--radius-lg);
   padding: 2.5rem;
   box-shadow: var(--shadow-md);
+  position: relative;
 }
 .auth-logo {
   font-size: 1.75rem;
@@ -86,6 +107,62 @@ a:hover {
   margin-top: 1.25rem;
   font-size: 0.875rem;
   color: var(--text-secondary);
+}
+.remember-forgot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0.75rem 0 1rem;
+  font-size: 0.8125rem;
+}
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-weight: 500;
+}
+.remember-me input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  margin: 0;
+}
+.forgot-link {
+  color: var(--primary);
+  font-size: 0.8125rem;
+  font-weight: 500;
+}
+.forgot-link:hover {
+  text-decoration: underline;
+}
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-input-wrapper input {
+  width: 100%;
+  padding-right: 2.75rem;
+}
+.password-toggle {
+  position: absolute;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.15rem;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  line-height: 1;
+}
+.password-toggle:hover {
+  color: var(--text);
 }
 .app-layout {
   display: flex;
@@ -672,4 +749,106 @@ a:hover {
   .project-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Theme Toggle */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+.theme-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+.auth-theme-toggle {
+  position: fixed;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 100;
+}
+
+[data-theme='dark'] .auth-wrapper {
+  background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+}
+
+/* Forgot Password / OTP Flow */
+.auth-step-desc {
+  text-align: center;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+.otp-steps {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 1.5rem;
+}
+.otp-step {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  color: var(--text-light);
+  background: var(--surface);
+  transition: all 0.2s;
+}
+.otp-step.active {
+  border-color: var(--primary);
+  color: #fff;
+  background: var(--primary);
+}
+.otp-step.completed {
+  border-color: var(--success);
+  color: #fff;
+  background: var(--success);
+}
+.otp-step-line {
+  width: 40px;
+  height: 2px;
+  background: var(--border);
+  transition: background 0.2s;
+}
+.otp-step-line.completed {
+  background: var(--success);
+}
+.otp-input {
+  text-align: center;
+  font-size: 1.5rem !important;
+  letter-spacing: 8px;
+  font-weight: 600;
+}
+.success-message {
+  background: var(--success-light);
+  color: var(--success);
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius);
+  font-size: 0.8125rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -1,12 +1,14 @@
 import axios from 'axios';
 
+const base = (import.meta.env.VITE_API_BASE as string) || '/api';
+
 export const api = axios.create({
-  baseURL: '/api',
+  baseURL: base,
   headers: { 'Content-Type': 'application/json' },
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('planify_token');
+  const token = localStorage.getItem('planify_token') || sessionStorage.getItem('planify_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
