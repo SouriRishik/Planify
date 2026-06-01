@@ -741,6 +741,10 @@ a:hover {
   cursor: pointer;
   padding: 0.25rem;
 }
+.mobile-menu-btn svg {
+  width: 24px;
+  height: 24px;
+}
 .mobile-menu-btn:hover {
   color: var(--primary);
 }
@@ -768,6 +772,12 @@ a:hover {
   .header-left {
     display: flex;
     align-items: center;
+  }
+  .header-right {
+    gap: 0.5rem;
+  }
+  .header-user {
+    display: none; /* Hide user name on small screens to prevent overflow */
   }
   .sidebar {
     position: fixed;
