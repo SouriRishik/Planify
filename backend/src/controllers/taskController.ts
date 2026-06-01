@@ -4,7 +4,7 @@ import { TaskModel } from '../models/Task';
 import { ProjectModel } from '../models/Project';
 
 export const taskController = {
-  getAll(req: AuthRequest, res: Response): void {
+  async getAll(req: AuthRequest, res: Response): Promise<void> {
     try {
       const filters = {
         priority: req.query.priority as string,
@@ -12,24 +12,28 @@ export const taskController = {
         sort_by: req.query.sort_by as string,
         sort_order: req.query.sort_order as 'asc' | 'desc',
       };
-      res.json(TaskModel.findAllByUser(req.userId!, filters));
-    } catch {
+      const tasks = await TaskModel.findAllByUser(req.userId!, filters);
+      res.json(tasks);
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to fetch tasks.' });
     }
   },
 
-  getStats(req: AuthRequest, res: Response): void {
+  async getStats(req: AuthRequest, res: Response): Promise<void> {
     try {
-      res.json(TaskModel.getStats(req.userId!));
-    } catch {
+      const stats = await TaskModel.getStats(req.userId!);
+      res.json(stats);
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to fetch stats.' });
     }
   },
 
-  getByProject(req: AuthRequest, res: Response): void {
+  async getByProject(req: AuthRequest, res: Response): Promise<void> {
     try {
       const projectId = Number(req.params.projectId);
-      if (!ProjectModel.findById(projectId, req.userId!)) {
+      if (!(await ProjectModel.findById(projectId, req.userId!))) {
         res.status(404).json({ error: 'Project not found.' });
         return;
       }
@@ -40,16 +44,18 @@ export const taskController = {
         sort_by: req.query.sort_by as string,
         sort_order: req.query.sort_order as 'asc' | 'desc',
       };
-      res.json(TaskModel.findByProject(projectId, req.userId!, filters));
-    } catch {
+      const tasks = await TaskModel.findByProject(projectId, req.userId!, filters);
+      res.json(tasks);
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to fetch tasks.' });
     }
   },
 
-  create(req: AuthRequest, res: Response): void {
+  async create(req: AuthRequest, res: Response): Promise<void> {
     try {
       const projectId = Number(req.params.projectId);
-      if (!ProjectModel.findById(projectId, req.userId!)) {
+      if (!(await ProjectModel.findById(projectId, req.userId!))) {
         res.status(404).json({ error: 'Project not found.' });
         return;
       }
@@ -57,7 +63,7 @@ export const taskController = {
       const { title, description, priority, status, due_date } = req.body;
       if (!title) { res.status(400).json({ error: 'Task title is required.' }); return; }
 
-      const task = TaskModel.create({
+      const task = await TaskModel.create({
         title,
         description: description || '',
         priority: priority || 'medium',
@@ -67,29 +73,33 @@ export const taskController = {
         user_id: req.userId!,
       });
       res.status(201).json(task);
-    } catch {
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to create task.' });
     }
   },
 
-  update(req: AuthRequest, res: Response): void {
+  async update(req: AuthRequest, res: Response): Promise<void> {
     try {
-      const task = TaskModel.update(Number(req.params.id), req.userId!, req.body);
+      const task = await TaskModel.update(Number(req.params.id), req.userId!, req.body);
       if (!task) { res.status(404).json({ error: 'Task not found.' }); return; }
       res.json(task);
-    } catch {
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to update task.' });
     }
   },
 
-  delete(req: AuthRequest, res: Response): void {
+  async delete(req: AuthRequest, res: Response): Promise<void> {
     try {
-      if (!TaskModel.delete(Number(req.params.id), req.userId!)) {
+      const ok = await TaskModel.delete(Number(req.params.id), req.userId!);
+      if (!ok) {
         res.status(404).json({ error: 'Task not found.' });
         return;
       }
       res.json({ message: 'Task deleted successfully.' });
-    } catch {
+    } catch (err) {
+      console.error(err);
       res.status(500).json({ error: 'Failed to delete task.' });
     }
   },

@@ -25,49 +25,53 @@ const withProgress = (row: any): IProjectWithProgress => ({
 });
 
 export const ProjectModel = {
-  findAllByUser(userId: number): IProjectWithProgress[] {
-    const rows = db.prepare(`
+  async findAllByUser(userId: number): Promise<IProjectWithProgress[]> {
+    const res = await db.query(`
       SELECT p.*,
              COUNT(t.id) as total_tasks,
              SUM(CASE WHEN t.status = 'done' THEN 1 ELSE 0 END) as completed_tasks
       FROM projects p
       LEFT JOIN tasks t ON t.project_id = p.id
-      WHERE p.user_id = ?
+      WHERE p.user_id = $1
       GROUP BY p.id
       ORDER BY p.updated_at DESC
-    `).all(userId);
-    return rows.map(withProgress);
+    `, [userId]);
+    return res.rows.map(withProgress);
   },
 
-  findById(id: number, userId: number): IProjectWithProgress | undefined {
-    const row = db.prepare(`
+  async findById(id: number, userId: number): Promise<IProjectWithProgress | undefined> {
+    const res = await db.query(`
       SELECT p.*,
              COUNT(t.id) as total_tasks,
              SUM(CASE WHEN t.status = 'done' THEN 1 ELSE 0 END) as completed_tasks
       FROM projects p
       LEFT JOIN tasks t ON t.project_id = p.id
-      WHERE p.id = ? AND p.user_id = ?
+      WHERE p.id = $1 AND p.user_id = $2
       GROUP BY p.id
-    `).get(id, userId);
+    `, [id, userId]);
+    const row = res.rows[0];
     return row ? withProgress(row) : undefined;
   },
 
-  create(name: string, description: string, userId: number): IProjectWithProgress {
-    const result = db.prepare(
-      'INSERT INTO projects (name, description, user_id) VALUES (?, ?, ?)'
-    ).run(name, description, userId);
-    return ProjectModel.findById(result.lastInsertRowid as number, userId)!;
+  async create(name: string, description: string, userId: number): Promise<IProjectWithProgress> {
+    const insert = await db.query(
+      'INSERT INTO projects (name, description, user_id) VALUES ($1, $2, $3) RETURNING id',
+      [name, description, userId],
+    );
+    const id = insert.rows[0].id as number;
+    return ProjectModel.findById(id, userId) as Promise<IProjectWithProgress>;
   },
 
-  update(id: number, name: string, description: string, userId: number): IProjectWithProgress | undefined {
-    const changes = db.prepare(`
-      UPDATE projects SET name = ?, description = ?, updated_at = datetime('now')
-      WHERE id = ? AND user_id = ?
-    `).run(name, description, id, userId).changes;
-    return changes > 0 ? ProjectModel.findById(id, userId) : undefined;
+  async update(id: number, name: string, description: string, userId: number): Promise<IProjectWithProgress | undefined> {
+    const res = await db.query(`
+      UPDATE projects SET name = $1, description = $2, updated_at = NOW()
+      WHERE id = $3 AND user_id = $4
+    `, [name, description, id, userId]);
+    return (res.rowCount || 0) > 0 ? ProjectModel.findById(id, userId) : undefined;
   },
 
-  delete(id: number, userId: number): boolean {
-    return db.prepare('DELETE FROM projects WHERE id = ? AND user_id = ?').run(id, userId).changes > 0;
+  async delete(id: number, userId: number): Promise<boolean> {
+    const res = await db.query('DELETE FROM projects WHERE id = $1 AND user_id = $2', [id, userId]);
+    return (res.rowCount || 0) > 0;
   },
 };
